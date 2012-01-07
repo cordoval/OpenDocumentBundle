@@ -2,6 +2,8 @@
 
 namespace Xaddax\OpenDocumentBundle\Model;
 
+use \OpenDocument_Storage_Zip;
+
 /*
  * This file is part of the Xaddax\OpenDocumentBundle
  *
@@ -11,40 +13,12 @@ namespace Xaddax\OpenDocumentBundle\Model;
  * with this source code in the file LICENSE.
  */
 
-require_once 'OpenDocument/Storage/Zip.php';
-require_once 'OpenDocument/Exception.php';
-
 /**
  * OpenDocument Manager.
  *
  * @author      Luis Cordova <cordoval@gmail.com>
  */
 class OpenDocumentManager
-{
-
-    public function __construct()
-    {
-        new \OpenDocument
-    }
-
-}
-
-
-/**
-* Base class containing methods to open and create documents.
-* It contains namespace definitions as well.
-*
-* This class is not to be extendet or derived from. Its only purpose is
-* to server as hub to create document objects, and to keep commonly used
-* constants.
-*
-* @category File_Formats
-* @package  OpenDocument
-* @author   Christian Weiske <cweiske@php.net>
-* @license  http://www.gnu.org/copyleft/lesser.html Lesser General Public License 2.1
-* @link     http://pear.php.net/package/OpenDocument
-*/
-abstract class OpenDocument
 {
     /**
      * Manifest namespace
@@ -97,54 +71,10 @@ abstract class OpenDocument
         'chart',
     );
 
-
-
-    /**
-     * This class cannot be instantiated.
-     * To create documents, use text(), spreadsheet() or the other
-     * static methods.
-     *
-     */
-    private function __construct()
+    public function __construct()
     {
+
     }
-
-
-
-    /**
-     * Open the given file
-     *
-     * @param string $file Name (path) of file to open
-     *
-     * @return OpenDocument_Document A document object
-     *
-     * @throw OpenDocument_Exception
-     */
-    public static function open($file)
-    {
-        //FIXME: detect correct storage
-        $storage = new OpenDocument_Storage_Zip();
-        $storage->open($file);
-
-        $mimetype = $storage->getMimeType();
-
-        switch ($mimetype) {
-        case 'application/vnd.oasis.opendocument.text':
-            $class = 'OpenDocument_Document_Text';
-            break;
-        default:
-            throw new OpenDocument_Exception(
-                'Unsupported MIME type ' . $mimetype
-            );
-            break;
-        }
-
-        self::includeClassFile($class);
-
-        return new $class($storage);
-    }//public static function open($file)
-
-
 
     /**
      * Creates and returns a new OpenDocument document object.
@@ -171,7 +101,7 @@ abstract class OpenDocument
      * @uses $documenttypes
      * @uses includeClassFile
      */
-    public static function create($type, $file = null, $storage = null)
+    public function create($type, $file = null, $storage = null)
     {
         if (!in_array($type, self::$documenttypes)) {
             throw new OpenDocument_Exception(
@@ -179,13 +109,11 @@ abstract class OpenDocument
             );
         }
         $class = 'OpenDocument_Document_' . ucfirst($type);
-        self::includeClassFile($class);
 
         if ($storage === null) {
             $storage = 'OpenDocument_Storage_Zip';
         }
         if (is_string($storage)) {
-            self::includeClassFile($storage);
             $storage = new $storage();
             $storage->create($type, $file);
         } else if (!$storage instanceof OpenDocument_Storage) {
@@ -198,29 +126,6 @@ abstract class OpenDocument
     }//public static function create(..)
 
 
-
-    /**
-     * Includes the correct class for the given file
-     *
-     * @param string $class Class name to load file for
-     *
-     * @return void
-     *
-     * @throws OpenDocument_Exception When the class cannot be loaded
-     */
-    protected function includeClassFile($class)
-    {
-        $file = str_replace('_', '/', $class) . '.php';
-        include_once $file;
-        if (!class_exists($class)) {
-            throw new OpenDocument_Exception(
-                'Class could not be loaded: ' . $class
-            );
-        }
-    }//protected function includeClassFile(..)
-
-
-
     /**
      * Creates and returns a new text document.
      *
@@ -231,114 +136,41 @@ abstract class OpenDocument
      *
      * @see create()
      */
-    public static function text($file = null, $storage = null)
+    public function text($file = null, $storage = null)
     {
-        return self::create('text', $file, $storage);
+        return $this->create('text', $file, $storage);
     }
-
-
 
     /**
-     * Creates and returns a new spreadsheet document.
-     * NOT IMPLEMENTED YET
+     * Open the given file
      *
-     * @param string $file    Name of file that will be saved
-     * @param mixed  $storage Storage class or object to use
+     * @param string $file Name (path) of file to open
      *
-     * @return OpenDocument_Document_Spreadsheet
+     * @return OpenDocument_Document A document object
      *
-     * @see create()
+     * @throw OpenDocument_Exception
      */
-    public static function spreadsheet($file = null, $storage = null)
+    public function open($file)
     {
-        //FIXME
-        throw new OpenDocument_Exception(
-            'Spreadsheet functionality not implemented yet'
-        );
-    }
+        //FIXME: detect correct storage
+        $storage = new OpenDocument_Storage_Zip();
+        $storage->open($file);
+
+        $mimetype = $storage->getMimeType();
+
+        switch ($mimetype) {
+        case 'application/vnd.oasis.opendocument.text':
+            $class = 'OpenDocument_Document_Text';
+            break;
+        default:
+            throw new OpenDocument_Exception(
+                'Unsupported MIME type ' . $mimetype
+            );
+            break;
+        }
+
+        return new $class($storage);
+    }//public static function open($file)
 
 
-
-    /**
-     * Creates and returns a new drawing document.
-     * NOT IMPLEMENTED YET
-     *
-     * @param string $file    Name of file that will be saved
-     * @param mixed  $storage Storage class or object to use
-     *
-     * @return OpenDocument_Document_Drawing
-     *
-     * @see create()
-     */
-    public static function drawing($file = null, $storage = null)
-    {
-        //FIXME
-        throw new OpenDocument_Exception(
-            'Drawing functionality not implemented yet'
-        );
-    }
-
-
-
-    /**
-     * Creates and returns a new presentation document.
-     * NOT IMPLEMENTED YET
-     *
-     * @param string $file    Name of file that will be saved
-     * @param mixed  $storage Storage class or object to use
-     *
-     * @return OpenDocument_Document_Presentation
-     *
-     * @see create()
-     */
-    public static function presentation($file = null, $storage = null)
-    {
-        //FIXME
-        throw new OpenDocument_Exception(
-            'Presentation functionality not implemented yet'
-        );
-    }
-
-
-
-    /**
-     * Creates and returns a new chart document.
-     * NOT IMPLEMENTED YET
-     *
-     * @param string $file    Name of file that will be saved
-     * @param mixed  $storage Storage class or object to use
-     *
-     * @return OpenDocument_Document_Chart
-     *
-     * @see create()
-     */
-    public static function chart($file = null, $storage = null)
-    {
-        //FIXME
-        throw new OpenDocument_Exception(
-            'Chart functionality not implemented yet'
-        );
-    }
-
-
-
-    /**
-     * Creates and returns a new image document.
-     * NOT IMPLEMENTED YET
-     *
-     * @param string $file    Name of file that will be saved
-     * @param mixed  $storage Storage class or object to use
-     *
-     * @return OpenDocument_Document_Image
-     *
-     * @see create()
-     */
-    public static function image($file = null, $storage = null)
-    {
-        //FIXME
-        throw new OpenDocument_Exception(
-            'Image functionality not implemented yet'
-        );
-    }
 }
-?>

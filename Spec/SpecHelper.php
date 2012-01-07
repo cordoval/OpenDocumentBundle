@@ -8,5 +8,8 @@ $loader = new UniversalClassLoader();
 $loader->registerNamespaces(array(
     'Xaddax'         => __DIR__.'/../../../',
 ));
+$loader->registerPrefixes(array(
+    'OpenDocument'     => __DIR__.'/../../../../vendor/php-opendocument',
+));
 
 $loader->register();
