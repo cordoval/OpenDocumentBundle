@@ -15,14 +15,14 @@ class DescribeOpenDocumentManager extends \PHPSpec\Context
         $this->manager = $this->spec(new OpenDocumentManager());
     }
 
-    public function itShouldCreateTextDocument()
+    public function xitShouldCreateTextDocument()
     {
         //$odt = new OpenDocument_Document_Text(new OpenDocument_Storage_Zip());
         $this->manager->create('text')->should->be(1);
         $this->manager->text()->should->be(1);
     }
 
-    public function itShouldOpenAnOpenDocumentFile()
+    public function xitShouldOpenAnOpenDocumentFile()
     {
         $this->manager->open('luis')->should->beFalse();
     }
