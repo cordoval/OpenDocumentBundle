@@ -183,6 +183,16 @@ class OpenDocumentManager
      */
     public function applyChanges($od, $changes)
     {
+        $startingPosition = $changes[0];
+        $stringToInsert = $changes[1];
+        /* @var $od \OpenDocument_Document_Text */
+        //loop throught document children
+        foreach ($od->getChildren() as $child) {
+            //go to the body of document tag text
+            if ($child instanceof OpenDocument_Element_Heading) {
+                $child->delete();
+            }
+        }
         return $od;
     }
 }
