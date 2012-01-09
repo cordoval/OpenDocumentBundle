@@ -111,7 +111,7 @@ class OpenDocumentManager
         $class = 'OpenDocument_Document_' . ucfirst($type);
 
         if ($storage === null) {
-            $storage = 'OpenDocument_Storage_Zip';
+            $storage = 'OpenDocument_Storage_Single';
         }
         if (is_string($storage)) {
             $storage = new $storage();
@@ -172,5 +172,17 @@ class OpenDocumentManager
         return new $class($storage);
     }//public static function open($file)
 
-
+    /**
+     * Apply changes to open document
+     *
+     * @param OpenDocument_Document $od A document object
+     * @param mixed $changes Changes to apply to document
+     *
+     * @return OpenDocument_Document A document object
+     *
+     */
+    public function applyChanges($od, $changes)
+    {
+        return $od;
+    }
 }
