@@ -3,6 +3,7 @@
 namespace Xaddax\OpenDocumentBundle\Model;
 
 use \OpenDocument_Storage_Zip;
+use Symfony\Component\DomCrawler\Crawler;
 
 /*
  * This file is part of the Xaddax\OpenDocumentBundle
@@ -183,16 +184,27 @@ class OpenDocumentManager
      */
     public function applyChanges($od, $changes)
     {
-        $startingPosition = $changes[0];
-        $stringToInsert = $changes[1];
-        /* @var $od \OpenDocument_Document_Text */
-        //loop throught document children
-        foreach ($od->getChildren() as $child) {
-            //go to the body of document tag text
-            if ($child instanceof OpenDocument_Element_Heading) {
-                $child->delete();
-            }
+        // grab info from changes
+        $startingPosition = $changes['position'];
+        $stringToInsert = $changes['stringToInsert'];
+
+        // look for the node <text:p>
+        $crawler = new Crawler($od->getDOM('content'));
+        $paragraphCrawler = $crawler->filterXPath('//text:p');
+        foreach($paragraphCrawler as $paragraph) {
+            $words = $paragraph->text();
+
+            // edit node contents
+            $newWords = substr_replace($words, $stringToInsert, $startingPosition, 0);
+            $crawler->detach($paragraph); // ?
+            $crawler->add(new \DOMNode(), $newWords);
         }
+
+        // replace node contents
+        $crawler->detach($workNode);
+        $od->setContentODM($crawler->attach(new \DOMNode(), $newNodeTextContents));
+
+        // return OpenDocument object with changes applied
         return $od;
     }
 }

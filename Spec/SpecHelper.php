@@ -7,6 +7,7 @@ use Symfony\Component\ClassLoader\UniversalClassLoader;
 $loader = new UniversalClassLoader();
 $loader->registerNamespaces(array(
     'Xaddax'         => __DIR__.'/../../../',
+    'Symfony'         => __DIR__.'/../../../../vendor/symfony/src',
 ));
 $loader->registerPrefixes(array(
     'OpenDocument'     => __DIR__.'/../../../../vendor/php-opendocument',
