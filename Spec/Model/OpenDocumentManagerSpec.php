@@ -22,20 +22,28 @@ class DescribeOpenDocumentManager extends \PHPSpec\Context
         $this->manager->create('text')->should->beAnInstanceOf('OpenDocument_Document_Text');
     }
 
-    public function itShouldOpenAnOpenDocumentFile()
+    public function itShouldOpenAnOpenDocumentFileAndThrowAnExceptionBecauseItDoesNotExist()
     {
-        $this->manager->open('luis')->should->beFalse();
+        $manager = $this->manager;
+        $this->spec(function() use ($manager) {
+            $manager->open('luis');
+        })->should->throwException('OpenDocument_Exception');
+
     }
 
-    public function itShouldApplyChangesToODT()
+    public function itShouldOpenAnExistingDocumentFile()
+    {
+        $this->pending('open/retrieve from phpcr repository an odm file');
+    }
+
+    public function itShouldApplyChangesToOdt()
     {
         // bring up
-        $storage = new OpenDocument_Storage_Single();
-        $storage->create('text');
-        $od = new OpenDocument_Document_Text($storage);
+        $manager = new OpenDocumentManager();
+        $od = $manager->create('text');
         $p1 = $od->createParagraph('My test paragraph');
         $p1->createTextElement('Iam persona');
-
+        $od->save();
         // define changes
         $changes = array(
             'position' => '8',
@@ -45,7 +53,7 @@ class DescribeOpenDocumentManager extends \PHPSpec\Context
         // call method and speck it
         $newOpenDocument = $this->manager->applyChanges($od, $changes);
         $newDOMContent = $newOpenDocument->getDOM('content');
-        var_export($newDOMContent);
+        var_export($newDOMContent->saveXML());
     }
 
 }

@@ -3,7 +3,7 @@
 namespace Xaddax\OpenDocumentBundle\Model;
 
 use \OpenDocument_Storage_Zip;
-use Symfony\Component\DomCrawler\Crawler;
+use Xaddax\OpenDocumentBundle\Model\ExtendedCrawler;
 
 /*
  * This file is part of the Xaddax\OpenDocumentBundle
@@ -189,9 +189,17 @@ class OpenDocumentManager
         $stringToInsert = $changes['stringToInsert'];
 
         // look for the node <text:p>
-        $crawler = new Crawler($od->getDOM('content'));
-        $paragraphCrawler = $crawler->filterXPath('//text:p');
+        //die(var_export($od->getDOM('content')->saveXml()));
+        $domDocument = $od->getDOM('content');
+        $xpath = new \DOMXPath($domDocument);
+        $xpath->registerNamespace('text',"urn:oasis:names:tc:opendocument:xmlns:text:1.0");
+        $oldNode = $xpath->query("//text:p")->item(1);
+        die(var_export($oldNode->textContent));
+
+        //die(var_export($paragraphCrawler));
+
         foreach($paragraphCrawler as $paragraph) {
+            var_export('entered');
             $words = $paragraph->text();
 
             // edit node contents
@@ -201,7 +209,6 @@ class OpenDocumentManager
         }
 
         // replace node contents
-        $crawler->detach($workNode);
         $od->setContentODM($crawler->attach(new \DOMNode(), $newNodeTextContents));
 
         // return OpenDocument object with changes applied
