@@ -43,7 +43,7 @@ class DescribeOpenDocumentManager extends \PHPSpec\Context
         $od = $manager->create('text');
         $p1 = $od->createParagraph('My test paragraph');
         $p1->createTextElement('Iam persona');
-        $od->save();
+
         // define changes
         $changes = array(
             'position' => '8',
@@ -53,7 +53,7 @@ class DescribeOpenDocumentManager extends \PHPSpec\Context
         // call method and speck it
         $newOpenDocument = $this->manager->applyChanges($od, $changes);
         $newDOMContent = $newOpenDocument->getDOM('content');
-        var_export($newDOMContent->saveXML());
+        //$newDOMContent->saveXML()->should->containText('test');
     }
 
 }

@@ -194,22 +194,9 @@ class OpenDocumentManager
         $xpath = new \DOMXPath($domDocument);
         $xpath->registerNamespace('text',"urn:oasis:names:tc:opendocument:xmlns:text:1.0");
         $oldNode = $xpath->query("//text:p")->item(1);
-        die(var_export($oldNode->textContent));
 
-        //die(var_export($paragraphCrawler));
-
-        foreach($paragraphCrawler as $paragraph) {
-            var_export('entered');
-            $words = $paragraph->text();
-
-            // edit node contents
-            $newWords = substr_replace($words, $stringToInsert, $startingPosition, 0);
-            $crawler->detach($paragraph); // ?
-            $crawler->add(new \DOMNode(), $newWords);
-        }
-
-        // replace node contents
-        $od->setContentODM($crawler->attach(new \DOMNode(), $newNodeTextContents));
+        // edit node contents
+        $oldNode->nodeValue = substr_replace($oldNode->nodeValue, $stringToInsert, $startingPosition, 0);
 
         // return OpenDocument object with changes applied
         return $od;
