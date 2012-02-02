@@ -192,7 +192,7 @@ class OpenDocumentManager
         //die(var_export($od->getDOM('content')->saveXml()));
         $domDocument = $od->getDOM('content');
         $xpath = new \DOMXPath($domDocument);
-        $xpath->registerNamespace('text',"urn:oasis:names:tc:opendocument:xmlns:text:1.0");
+        $xpath->registerNamespace('text', "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
         $oldNode = $xpath->query("//text:p")->item(1);
 
         // edit node contents
