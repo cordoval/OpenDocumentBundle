@@ -4,6 +4,7 @@ namespace Xaddax\OpenDocumentBundle\Model;
 
 use \OpenDocument_Storage_Zip;
 use Xaddax\OpenDocumentBundle\Model\ExtendedCrawler;
+use \OpenDocument_Exception;
 
 /*
  * This file is part of the Xaddax\OpenDocumentBundle
@@ -117,7 +118,7 @@ class OpenDocumentManager
         if (is_string($storage)) {
             $storage = new $storage();
             $storage->create($type, $file);
-        } else if (!$storage instanceof OpenDocument_Storage) {
+        } else if (!$storage instanceof \OpenDocument_Storage) {
             throw new OpenDocument_Exception(
                 'Storage must implement OpenDocument_Storage interface'
             );
